@@ -1,0 +1,8 @@
+This is a patch diff for Highcharts source v2.1.4
+
+To apply the patch do:
+
+patch highcharts.src.js < highcharts.src.js.patch
+
+Please Email me if you find any problem.
+kuan.joe@gmail.com

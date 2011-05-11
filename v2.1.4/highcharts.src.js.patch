@@ -1,0 +1,79 @@
+--- highcharts.src.js.bak	2011-05-11 21:23:25.000000000 +0100
++++ highcharts.src.js	2011-05-11 21:28:13.000000000 +0100
+@@ -3844,6 +3844,7 @@
+ 		isInsidePlot, // function
+ 		tooltip,
+ 		mouseIsDown,
++		rightClick,  // for contextmenu
+ 		loadingDiv,
+ 		loadingSpan,
+ 		loadingShown,
+@@ -6052,6 +6053,46 @@
+ 		function setDOMEvents () {
+ 			var lastWasOutsidePlot = true;
+ 			
++			// Note: Safari 5: mousedown, contextmenu, click
++			//       Firefox: mousedown contextmenu
++		        container.oncontextmenu = function(e) { 
++
++				chart.rightClick = rightClick = true;
++				//console.log('oncontextmenu');
++				
++				var hoverPoint = chart.hoverPoint;
++				e = normalizeMouseEvent(e);
++				 
++				e.cancelBubble = true; // IE specific
++				if (e.stopPropagation)
++				  e.stopPropagation();
++				if (e.preventDefault)
++				  e.preventDefault();
++
++				if (!hasDragged) {
++					if (hoverPoint && attr(e.target, 'isTracker')) {
++						var plotX = hoverPoint.plotX,
++							plotY = hoverPoint.plotY;
++							
++						// add page position info
++						extend(hoverPoint, {
++							pageX: chartPosition.left + plotLeft + 
++								(inverted ? plotWidth - plotY : plotX),
++							pageY: chartPosition.top + plotTop + 
++								(inverted ? plotHeight - plotX : plotY)
++						});
++						
++						// the series click event
++						fireEvent(hoverPoint.series, 'contextmenu', extend(e, {
++							point: hoverPoint
++						}));
++						
++						// the point click event
++						hoverPoint.firePointEvent('contextmenu', e);
++					}
++				}
++			};
++
+ 			/*
+ 			 * Record the starting position of a dragoperation
+ 			 */
+@@ -6062,6 +6103,7 @@
+ 				//e.preventDefault && e.preventDefault();
+ 				
+ 				chart.mouseIsDown = mouseIsDown = true;
++				chart.rightClick = rightClick = false;
+ 				mouseDownX = e.chartX;
+ 				mouseDownY = e.chartY;
+ 				
+@@ -6217,6 +6259,13 @@
+ 			
+ 			// MooTools 1.2.3 doesn't fire this in IE when using addEvent
+ 			container.onclick = function(e) {
++
++				// Safari 5: call click with contextmenu
++				if (rightClick)  {
++				  rightClick = chart.rightClick = false;
++				  return;
++				}
++
+ 				var hoverPoint = chart.hoverPoint;
+ 				e = normalizeMouseEvent(e);
+ 				 
