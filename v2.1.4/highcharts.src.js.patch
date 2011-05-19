@@ -1,5 +1,5 @@
---- highcharts.src.js.bak	2011-05-11 21:23:25.000000000 +0100
-+++ highcharts.src.js	2011-05-11 21:28:13.000000000 +0100
+--- highcharts.src.js.org	2011-05-19 10:53:49.000000000 +0100
++++ highcharts.src.js	2011-05-19 10:53:04.000000000 +0100
 @@ -3844,6 +3844,7 @@
  		isInsidePlot, // function
  		tooltip,
@@ -8,7 +8,35 @@
  		loadingDiv,
  		loadingSpan,
  		loadingShown,
-@@ -6052,6 +6053,46 @@
+@@ -5996,17 +5997,23 @@
+ 		/**
+ 		 * Mouse up or outside the plot area
+ 		 */
+-		function drop() {
++		function drop(e) {
++
++			e = normalizeMouseEvent(e);
++
+ 			if (selectionMarker) {
+ 				var selectionData = {
+ 						xAxis: [],
+-						yAxis: []
++						yAxis: [],
++						// Provide the x, y location in case for context menu to display
++						// next to the pointer
++						x: e.originalEvent.x,
++						y: e.originalEvent.y
+ 					},
+ 					selectionBox = selectionMarker.getBBox(),
+ 					selectionLeft = selectionBox.x - plotLeft,
+ 					selectionTop = selectionBox.y - plotTop;
+-				
+-					
++
+ 				// a selection has been made
+ 				if (hasDragged) {
+ 					
+@@ -6052,6 +6059,46 @@
  		function setDOMEvents () {
  			var lastWasOutsidePlot = true;
  			
@@ -55,7 +83,7 @@
  			/*
  			 * Record the starting position of a dragoperation
  			 */
-@@ -6062,6 +6103,7 @@
+@@ -6062,6 +6109,7 @@
  				//e.preventDefault && e.preventDefault();
  				
  				chart.mouseIsDown = mouseIsDown = true;
@@ -63,7 +91,7 @@
  				mouseDownX = e.chartX;
  				mouseDownY = e.chartY;
  				
-@@ -6217,6 +6259,13 @@
+@@ -6217,6 +6265,13 @@
  			
  			// MooTools 1.2.3 doesn't fire this in IE when using addEvent
  			container.onclick = function(e) {
