@@ -15,8 +15,8 @@
 > 						yAxis: [],
 > 						// Provide the x, y location in case for context menu to display
 > 						// next to the pointer
-> 						x: e.originalEvent.x,
-> 						y: e.originalEvent.y
+> 						clientX: e.originalEvent.clientX,
+> 						clientY: e.originalEvent.clientY
 6009d6015
 < 					
 6054a6061,6104
@@ -24,8 +24,8 @@
 > 			if (isIE)
 > 		          $(container).bind('contextmenu', function(e) { return false; });
 > 
-> 			// Note: Safari 5: mousedown, contextmenu, click
-> 			//       Firefox: mousedown contextmenu
+> 			// Note: Safari 5, IE8: mousedown, contextmenu, click
+> 			//       Firefox 5: mousedown contextmenu
 > 		        container.oncontextmenu = function(e) { 
 > 
 > 				chart.rightClick = rightClick = true;
