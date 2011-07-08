@@ -1,0 +1,164 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="/extjs/resources/css/ext-all.css" />
+  <script type="text/javascript" src="/extjs/adapter/ext/ext-base.js"></script>
+  <script type="text/javascript" src="/extjs/ext-all-debug-w-comments.js"></script>
+
+ <!-- Highcharts includes -->
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
+
+ <!-- Make sure this is the highcharts file with the context menu mod -->
+ <script type="text/javascript" src="/highcharts/js/highcharts.src.js"></script>
+
+ <!-- ExtJS adapter for Highcharts -->
+ <script type="text/javascript" src="/highcharts_extjs/adapter-extjs.js"></script> 
+
+ <!-- ExtJS Plugin for Highcharts -->
+ <script type="text/javascript" src="/highcharts_extjs/Ext.ux.HighChart.js"></script>
+
+  <title id='page-title'>Highchart example</title>
+  <script type="text/javascript">
+   Ext.BLANK_IMAGE_URL = '/extjs/resources/images/default/s.gif';
+
+   Ext.onReady(function() {
+
+       // Disable browser default context menu
+       $(document).bind("contextmenu",function(e){
+                        return false;
+                         }); 
+
+  // Main routine for creating and display context menu for the point data
+  var ctxMenuCharts = function(point) {
+
+    // Position of the cursor right click
+    var pos = [ point.clientX, point.clientY ];
+
+    var menu = new Ext.menu.Menu({
+      items: [
+        { text: 'Menu 1',
+          scope: point,
+          handler: function() {
+            var x_val = this.point.category;
+            var y_val = this.point.y;
+            var msg = "Selected series name: " + this.point.series.name + "<BR/>";
+            msg += "Selected point x val: " + x_val + " (" + Highcharts.dateFormat('%d %b', x_val) + "), y val: " + y_val + "<BR/>";
+            Ext.Msg.alert('Info', msg);
+            menu.destroy();
+          }
+        },
+        { text: 'Menu 2' }
+      ]
+    });
+
+    menu.showAt(pos);
+  };
+        Ext.QuickTips.init();
+
+	var chart = new Ext.ux.HighChart(
+                {  
+		    id: 'my_chart',
+                    chartConfig: {
+                    chart: { },
+                    title: { text: 'Monthly Totals' },
+                    xAxis: {
+                        type: 'datetime',
+                        tickPixelInterval: 50,
+                        labels: {
+                            formatter: function() {
+                                return Highcharts.dateFormat('%d %b', this.value);
+                            }
+                        },
+                        title: { text: 'Date' }
+                    },
+                    yAxis: {
+                        title: {
+                        text: 'Usage (Megabytes)'
+                            },
+                        labels: {
+                        formatter: function() {
+                                    return Math.ceil(this.value/1024) +'M';
+                                }
+                        }
+                    },
+                    tooltip: {
+                        formatter: function() {
+                            return this.series.name +': <b>'+
+                            Math.ceil(this.y/1024) +'</b>Megabytes on '+  Highcharts.dateFormat('%d %b', this.x);
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                          allowPointSelect: true,
+                          events: {
+                            contextmenu: ctxMenuCharts
+                          }
+                        },
+                        area: {
+                            pointStart: Date.UTC(2011, 5, 1),
+                                    pointInterval : 24 * 60 * 60 * 1000,
+                                    marker: {
+                                        enabled: false,
+                                        symbol: 'circle',
+                                        radius: 2,
+                                        states: {
+                                         hover: { enabled: true }
+                                        }
+                                    }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Uploads',
+                        type: 'area',
+                        data: [null, null, null, null, null, 6 , 11, 32, 110, 235, 369, 640,
+                        1005, 1436, 2063, 3057, 4618, 6444, 9822, 15468, 20434, 24126,
+                        27387, 29459, 31056, 31982, 32040, 31233, 29224, 27342, 26662,
+                        26956, 27912, 28999, 28965, 27826, 25579, 25722, 24826, 24605,
+                        24304, 23464, 23708, 24099, 24357, 24237, 24401, 24344, 23586,
+                        22380, 21004, 17287, 14747, 13076, 12555, 12144, 11009, 10950,
+                        10871, 10824, 10577, 10527, 10475, 10421, 10358, 10295, 10104 ]
+                            }, {
+                    name: 'Downloads',
+                        type: 'area',
+                        data: [null, null, null, null, null, null, null , null , null ,null,
+                        5, 25, 50, 120, 150, 200, 426, 660, 869, 1060, 1605, 2471, 3322,
+                        4238, 5221, 6129, 7089, 8339, 9399, 10538, 11643, 13092, 14478,
+                        15915, 17385, 19055, 21205, 23044, 25393, 27935, 30062, 32049,
+                        33952, 35804, 37431, 39197, 45000, 43000, 41000, 39000, 37000,
+                        35000, 33000, 31000, 29000, 27000, 25000, 24000, 23000, 22000,
+                        21000, 20000, 19000, 18000, 18000, 17000, 16000]
+                    }]
+            }
+	);
+
+        myPerfromancePanel = Ext.extend(Ext.Panel, {
+            title:      'My Performance',
+            constructor : function (config) {
+                config = config || {};
+                var arguments = Ext.apply({
+                layout: 'anchor',
+                anchor: '100% 50%',
+		listeners: {
+                    resize : function(component, aw, ah) {
+                        Ext.getCmp('my_chart').setWidth(aw);
+			Ext.getCmp('my_chart').setHeight(ah - 30);
+                        }
+		},
+                items: [ chart
+            ]//end items
+            }, config);
+
+            myPerfromancePanel.superclass.constructor.call(this, arguments);
+            }//end constructor()
+
+        }); // myPerfromancePanel
+        Ext.reg('myPanel', myPerfromancePanel); 
+
+new Ext.Window({ title: 'Example', layout: 'fit', height: 400, width: 600, items: { xtype: 'myPanel'} }).show();
+});
+  </script>
+</head>
+<body></body>
+</html>
+

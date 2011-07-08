@@ -4,5 +4,10 @@ To apply the patch do:
 
 patch highcharts.src.js < highcharts.src.js.patch
 
+Alternatively, highcharts.src.js contains the context menu mod.
+
+highCharts-resize.html is the working example. You need to change the javascript source path.
+For more detail, see http://joekuan.wordpress.com/2011/07/08/create-context-menu-on-highcharts-graph-with-extjs-3/
+  
 Please Email me if you find any problem.
 kuan.joe@gmail.com
